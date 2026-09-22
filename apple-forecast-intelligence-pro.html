@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Apple Forecast Intelligence</title>
+<style>
+:root {
+  --bg:#060914; --panel:rgba(13,18,33,.78); --panel2:rgba(18,25,44,.78);
+  --text:#eef4ff; --muted:#8d99b3; --line:rgba(255,255,255,.09);
+  --accent:#8b5cf6; --accent2:#22d3ee; --green:#4ade80; --red:#fb7185;
+}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%;font-family:Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,sans-serif;background:var(--bg);color:var(--text)}
+body{overflow-x:hidden}
+#particles{position:fixed;inset:0;z-index:0;pointer-events:none}
+.grid{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.35;background-image:linear-gradient(rgba(139,92,246,.08) 1px,transparent 1px),linear-gradient(90deg,rgba(34,211,238,.06) 1px,transparent 1px);background-size:55px 55px;mask-image:linear-gradient(to bottom,black,transparent 88%)}
+.app{position:relative;z-index:1;max-width:1380px;margin:auto;padding:28px}
+.nav{display:flex;justify-content:space-between;align-items:center;gap:18px;margin-bottom:30px}
+.brand{display:flex;align-items:center;gap:12px;font-weight:800;letter-spacing:.12em;font-size:13px}
+.logo{width:38px;height:38px;border-radius:12px;background:linear-gradient(135deg,var(--accent),var(--accent2));display:grid;place-items:center;font-weight:900;color:white;box-shadow:0 0 30px rgba(139,92,246,.28)}
+.status{border:1px solid var(--line);background:rgba(255,255,255,.035);padding:9px 13px;border-radius:999px;color:#b8c2d9;font-size:12px}
+.status i{display:inline-block;width:7px;height:7px;background:var(--green);border-radius:50%;margin-right:7px;box-shadow:0 0 12px var(--green)}
+.hero{display:grid;grid-template-columns:1.5fr .75fr;gap:22px;align-items:stretch}
+.card{background:linear-gradient(145deg,rgba(19,25,44,.82),rgba(8,12,24,.78));border:1px solid var(--line);border-radius:24px;backdrop-filter:blur(18px);box-shadow:0 24px 70px rgba(0,0,0,.28)}
+.hero-copy{padding:38px;position:relative;overflow:hidden}
+.hero-copy:after{content:"";position:absolute;width:300px;height:300px;border-radius:50%;right:-100px;top:-130px;background:radial-gradient(circle,rgba(34,211,238,.17),transparent 65%);pointer-events:none}
+.eyebrow{font-size:11px;color:#9ca8c2;letter-spacing:.18em;text-transform:uppercase}
+h1{font-size:clamp(36px,5vw,68px);line-height:.98;margin:12px 0 18px;letter-spacing:-.055em}
+.gradient{background:linear-gradient(90deg,#fff,var(--accent2),#b8a2ff);-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero p{color:var(--muted);max-width:720px;line-height:1.7;margin:0}
+.hero-kpi{padding:28px;display:flex;flex-direction:column;justify-content:space-between}
+.kpi-label{color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.1em}
+.price{font-size:52px;font-weight:800;letter-spacing:-.05em;margin:8px 0}
+.delta{font-size:14px;color:var(--green)}
+.controls{display:flex;flex-wrap:wrap;gap:10px;margin-top:25px}
+button{border:1px solid var(--line);background:rgba(255,255,255,.045);color:var(--text);padding:11px 15px;border-radius:12px;cursor:pointer;font-weight:650;transition:.2s}
+button:hover{transform:translateY(-1px);border-color:rgba(139,92,246,.55);background:rgba(139,92,246,.12)}
+button.primary{background:linear-gradient(135deg,var(--accent),#6d4ce8);border:0}
+.grid-main{display:grid;grid-template-columns:1.7fr .8fr;gap:22px;margin-top:22px}
+.chart-card{padding:24px}
+.section-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:14px}
+.section-head h2{font-size:17px;margin:0 0 5px}
+.section-head p{font-size:12px;color:var(--muted);margin:0}
+canvas{width:100%;height:420px;display:block;border-radius:18px}
+.side{display:flex;flex-direction:column;gap:22px}
+.mini{padding:23px}
+.metric{display:flex;justify-content:space-between;gap:10px;padding:13px 0;border-bottom:1px solid var(--line)}
+.metric:last-child{border-bottom:0}
+.metric span:first-child{color:var(--muted);font-size:12px}
+.metric strong{font-size:13px}
+.slider-wrap{margin-top:16px}
+input[type=range]{width:100%;accent-color:var(--accent)}
+.range-row{display:flex;justify-content:space-between;color:var(--muted);font-size:11px}
+.forecast-value{font-size:30px;font-weight:800;margin:5px 0 2px}
+.note{font-size:11px;line-height:1.55;color:#7f8aa4;margin-top:12px}
+.arch{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:12px}
+.arch div{border:1px solid var(--line);background:rgba(255,255,255,.025);border-radius:14px;padding:13px;text-align:center}
+.arch b{display:block;font-size:12px} .arch span{display:block;color:var(--muted);font-size:10px;margin-top:4px}
+.footer{padding:25px 3px 8px;color:#68738b;font-size:11px;display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap}
+@media(max-width:950px){.hero,.grid-main{grid-template-columns:1fr}}
+@media(max-width:620px){.app{padding:16px}.hero-copy{padding:25px}.hero-kpi{padding:23px}canvas{height:300px}.arch{grid-template-columns:repeat(2,1fr)}h1{font-size:43px}}
+</style>
+</head>
+<body>
+<canvas id="particles"></canvas><div class="grid"></div>
+<div class="app">
+  <div class="nav">
+    <div class="brand"><div class="logo">A</div> APPLE · FORECAST INTELLIGENCE</div>
+    <div class="status"><i></i> Interactive prediction workspace</div>
+  </div>
+
+  <section class="hero">
+    <div class="card hero-copy">
+      <div class="eyebrow">LSTM market visualization platform</div>
+      <h1>See the signal.<br><span class="gradient">Explore the forecast.</span></h1>
+      <p>Professional visualization for your Apple stock prediction project. Explore the latest historical price movement, compare a forecast scenario, and inspect the neural-network configuration from your notebook.</p>
+      <div class="controls">
+        <button class="primary" id="animateBtn">▶ Animate signal</button>
+        <button id="resetBtn">Reset view</button>
+        <button id="range30">30D</button><button id="range90">90D</button><button id="range180">180D</button>
+      </div>
+    </div>
+    <div class="card hero-kpi">
+      <div><div class="kpi-label">Latest close in dataset</div><div class="price" id="latestPrice">$131.56</div><div class="delta" id="delta">+1.50 · +1.15% vs previous session</div></div>
+      <div><div class="kpi-label">Data coverage</div><strong id="coverage">Dec 1980 → Jun 2022</strong></div>
+    </div>
+  </section>
+
+  <section class="grid-main">
+    <div class="card chart-card">
+      <div class="section-head">
+        <div><h2>Close price intelligence</h2><p>Actual historical data from AAPL.csv · interactive forecast scenario</p></div>
+        <div class="status" id="rangeLabel">Last 180 sessions</div>
+      </div>
+      <canvas id="chart" aria-label="Interactive Apple close price chart"></canvas>
+    </div>
+
+    <div class="side">
+      <div class="card mini">
+        <div class="kpi-label">Forecast scenario</div>
+        <div class="forecast-value" id="forecastValue">$136.16</div>
+        <div style="color:var(--muted);font-size:11px">Adjustable visualization value</div>
+        <div class="slider-wrap"><input id="forecast" type="range" min="105.25" max="164.45" step=".01" value="136.16"></div>
+        <div class="range-row"><span>-20%</span><span>Current</span><span>+25%</span></div>
+        <div class="note">This control is a visualization layer. It does not retrain or modify the LSTM model in the notebook.</div>
+      </div>
+
+      <div class="card mini">
+        <div class="kpi-label">Model architecture</div>
+        <div class="arch">
+          <div><b>60</b><span>lookback</span></div>
+          <div><b>3×50</b><span>LSTM units</span></div>
+          <div><b>0.30</b><span>dropout</span></div>
+          <div><b>Adam</b><span>optimizer</span></div>
+        </div>
+        <div class="metric"><span>Loss</span><strong>Mean Squared Error</strong></div>
+        <div class="metric"><span>Epochs</span><strong>100 max</strong></div>
+        <div class="metric"><span>Batch size</span><strong>3</strong></div>
+        <div class="metric"><span>Early stopping</span><strong>Patience 10</strong></div>
+      </div>
+    </div>
+  </section>
+
+  <div class="footer">
+    <span>Built from your Apple LSTM notebook + AAPL historical dataset.</span>
+    <span>Visualization platform · responsive · interactive · no external data required</span>
+  </div>
+</div>
+
+<script>
+const DATA = [{"date":"2021-10-01","open":141.9,"high":142.92,"low":139.11,"close":142.65,"volume":94639600},{"date":"2021-10-04","open":141.76,"high":142.21,"low":138.27,"close":139.14,"volume":98322000},{"date":"2021-10-05","open":139.49,"high":142.24,"low":139.36,"close":141.11,"volume":80861100},{"date":"2021-10-06","open":139.47,"high":142.15,"low":138.37,"close":142.0,"volume":83221100},{"date":"2021-10-07","open":143.06,"high":144.22,"low":142.72,"close":143.29,"volume":61732700},{"date":"2021-10-08","open":144.03,"high":144.18,"low":142.56,"close":142.9,"volume":58773200},{"date":"2021-10-11","open":142.27,"high":144.81,"low":141.81,"close":142.81,"volume":64452200},{"date":"2021-10-12","open":143.23,"high":143.25,"low":141.04,"close":141.51,"volume":73035900},{"date":"2021-10-13","open":141.24,"high":141.4,"low":139.2,"close":140.91,"volume":78762700},{"date":"2021-10-14","open":142.11,"high":143.88,"low":141.51,"close":143.76,"volume":69907100},{"date":"2021-10-15","open":143.77,"high":144.9,"low":143.51,"close":144.84,"volume":67940300},{"date":"2021-10-18","open":143.45,"high":146.84,"low":143.16,"close":146.55,"volume":85589200},{"date":"2021-10-19","open":147.01,"high":149.17,"low":146.55,"close":148.76,"volume":76378900},{"date":"2021-10-20","open":148.7,"high":149.75,"low":148.12,"close":149.26,"volume":58418800},{"date":"2021-10-21","open":148.81,"high":149.64,"low":147.87,"close":149.48,"volume":61421000},{"date":"2021-10-22","open":149.69,"high":150.18,"low":148.64,"close":148.69,"volume":58883400},{"date":"2021-10-25","open":148.68,"high":149.37,"low":147.62,"close":148.64,"volume":50720600},{"date":"2021-10-26","open":149.33,"high":150.84,"low":149.01,"close":149.32,"volume":60893400},{"date":"2021-10-27","open":149.36,"high":149.73,"low":148.49,"close":148.85,"volume":56094900},{"date":"2021-10-28","open":149.82,"high":153.17,"low":149.72,"close":152.57,"volume":100077900},{"date":"2021-10-29","open":147.22,"high":149.94,"low":146.41,"close":149.8,"volume":124953200},{"date":"2021-11-01","open":148.99,"high":149.7,"low":147.8,"close":148.96,"volume":74588300},{"date":"2021-11-02","open":148.66,"high":151.57,"low":148.65,"close":150.02,"volume":69122000},{"date":"2021-11-03","open":150.39,"high":151.97,"low":149.82,"close":151.49,"volume":54511500},{"date":"2021-11-04","open":151.58,"high":152.43,"low":150.64,"close":150.96,"volume":60394600},{"date":"2021-11-05","open":151.89,"high":152.2,"low":150.06,"close":151.28,"volume":65463900},{"date":"2021-11-08","open":151.41,"high":151.57,"low":150.16,"close":150.44,"volume":55020900},{"date":"2021-11-09","open":150.2,"high":151.43,"low":150.06,"close":150.81,"volume":56787900},{"date":"2021-11-10","open":150.02,"high":150.13,"low":147.85,"close":147.92,"volume":65187100},{"date":"2021-11-11","open":148.96,"high":149.43,"low":147.68,"close":147.87,"volume":41000000},{"date":"2021-11-12","open":148.43,"high":150.4,"low":147.48,"close":149.99,"volume":63804000},{"date":"2021-11-15","open":150.37,"high":151.88,"low":149.43,"close":150.0,"volume":59222800},{"date":"2021-11-16","open":149.94,"high":151.49,"low":149.34,"close":151.0,"volume":59256200},{"date":"2021-11-17","open":151.0,"high":155.0,"low":150.99,"close":153.49,"volume":88807000},{"date":"2021-11-18","open":153.71,"high":158.67,"low":153.05,"close":157.87,"volume":137827700},{"date":"2021-11-19","open":157.65,"high":161.02,"low":156.53,"close":160.55,"volume":117305600},{"date":"2021-11-22","open":161.68,"high":165.7,"low":161.0,"close":161.02,"volume":117467900},{"date":"2021-11-23","open":161.12,"high":161.8,"low":159.06,"close":161.41,"volume":96041900},{"date":"2021-11-24","open":160.75,"high":162.14,"low":159.64,"close":161.94,"volume":69463600},{"date":"2021-11-26","open":159.57,"high":160.45,"low":156.36,"close":156.81,"volume":76959800},{"date":"2021-11-29","open":159.37,"high":161.19,"low":158.79,"close":160.24,"volume":88748200},{"date":"2021-11-30","open":159.99,"high":165.52,"low":159.92,"close":165.3,"volume":174048100},{"date":"2021-12-01","open":167.48,"high":170.3,"low":164.53,"close":164.77,"volume":152052500},{"date":"2021-12-02","open":158.74,"high":164.2,"low":157.8,"close":163.76,"volume":136739200},{"date":"2021-12-03","open":164.02,"high":164.96,"low":159.72,"close":161.84,"volume":118023100},{"date":"2021-12-06","open":164.29,"high":167.88,"low":164.28,"close":165.32,"volume":107497000},{"date":"2021-12-07","open":169.08,"high":171.58,"low":168.34,"close":171.18,"volume":120405400},{"date":"2021-12-08","open":172.13,"high":175.96,"low":170.7,"close":175.08,"volume":116998900},{"date":"2021-12-09","open":174.91,"high":176.75,"low":173.92,"close":174.56,"volume":108923700},{"date":"2021-12-10","open":175.21,"high":179.63,"low":174.69,"close":179.45,"volume":115402700},{"date":"2021-12-13","open":181.12,"high":182.13,"low":175.53,"close":175.74,"volume":153237000},{"date":"2021-12-14","open":175.25,"high":177.74,"low":172.21,"close":174.33,"volume":139380400},{"date":"2021-12-15","open":175.11,"high":179.5,"low":172.31,"close":179.3,"volume":131063300},{"date":"2021-12-16","open":179.28,"high":181.14,"low":170.75,"close":172.26,"volume":150185800},{"date":"2021-12-17","open":169.93,"high":173.47,"low":169.69,"close":171.14,"volume":195432700},{"date":"2021-12-20","open":168.28,"high":170.58,"low":167.46,"close":169.75,"volume":107499100},{"date":"2021-12-21","open":171.56,"high":173.2,"low":169.12,"close":172.99,"volume":91185900},{"date":"2021-12-22","open":173.04,"high":175.86,"low":172.15,"close":175.64,"volume":92135300},{"date":"2021-12-23","open":175.85,"high":176.85,"low":175.27,"close":176.28,"volume":68356600},{"date":"2021-12-27","open":177.09,"high":180.42,"low":177.07,"close":180.33,"volume":74919600},{"date":"2021-12-28","open":180.16,"high":181.33,"low":178.53,"close":179.29,"volume":79144300},{"date":"2021-12-29","open":179.33,"high":180.63,"low":178.14,"close":179.38,"volume":62348900},{"date":"2021-12-30","open":179.47,"high":180.57,"low":178.09,"close":178.2,"volume":59773000},{"date":"2021-12-31","open":178.09,"high":179.23,"low":177.26,"close":177.57,"volume":64062300},{"date":"2022-01-03","open":177.83,"high":182.88,"low":177.71,"close":182.01,"volume":104487900},{"date":"2022-01-04","open":182.63,"high":182.94,"low":179.12,"close":179.7,"volume":99310400},{"date":"2022-01-05","open":179.61,"high":180.17,"low":174.64,"close":174.92,"volume":94537600},{"date":"2022-01-06","open":172.7,"high":175.3,"low":171.64,"close":172.0,"volume":96904000},{"date":"2022-01-07","open":172.89,"high":174.14,"low":171.03,"close":172.17,"volume":86709100},{"date":"2022-01-10","open":169.08,"high":172.5,"low":168.17,"close":172.19,"volume":106765600},{"date":"2022-01-11","open":172.32,"high":175.18,"low":170.82,"close":175.08,"volume":76138300},{"date":"2022-01-12","open":176.12,"high":177.18,"low":174.82,"close":175.53,"volume":74805200},{"date":"2022-01-13","open":175.78,"high":176.62,"low":171.79,"close":172.19,"volume":84505800},{"date":"2022-01-14","open":171.34,"high":173.78,"low":171.09,"close":173.07,"volume":80440800},{"date":"2022-01-18","open":171.51,"high":172.54,"low":169.41,"close":169.8,"volume":90956700},{"date":"2022-01-19","open":170.0,"high":171.08,"low":165.94,"close":166.23,"volume":94815000},{"date":"2022-01-20","open":166.98,"high":169.68,"low":164.18,"close":164.51,"volume":91420500},{"date":"2022-01-21","open":164.42,"high":166.33,"low":162.3,"close":162.41,"volume":122848900},{"date":"2022-01-24","open":160.02,"high":162.3,"low":154.7,"close":161.62,"volume":162294600},{"date":"2022-01-25","open":158.98,"high":162.76,"low":157.02,"close":159.78,"volume":115798400},{"date":"2022-01-26","open":163.5,"high":164.39,"low":157.82,"close":159.69,"volume":108275300},{"date":"2022-01-27","open":162.45,"high":163.84,"low":158.28,"close":159.22,"volume":121954600},{"date":"2022-01-28","open":165.71,"high":170.35,"low":162.8,"close":170.33,"volume":179935700},{"date":"2022-01-31","open":170.16,"high":175.0,"low":169.51,"close":174.78,"volume":115541600},{"date":"2022-02-01","open":174.01,"high":174.84,"low":172.31,"close":174.61,"volume":86213900},{"date":"2022-02-02","open":174.75,"high":175.88,"low":173.33,"close":175.84,"volume":84914300},{"date":"2022-02-03","open":174.48,"high":176.24,"low":172.12,"close":172.9,"volume":89418100},{"date":"2022-02-04","open":171.68,"high":174.1,"low":170.68,"close":172.39,"volume":82465400},{"date":"2022-02-07","open":172.86,"high":173.95,"low":170.95,"close":171.66,"volume":77251200},{"date":"2022-02-08","open":171.73,"high":175.35,"low":171.43,"close":174.83,"volume":74829200},{"date":"2022-02-09","open":176.05,"high":176.65,"low":174.9,"close":176.28,"volume":71285000},{"date":"2022-02-10","open":174.14,"high":175.48,"low":171.55,"close":172.12,"volume":90865900},{"date":"2022-02-11","open":172.33,"high":173.08,"low":168.04,"close":168.64,"volume":98670700},{"date":"2022-02-14","open":167.37,"high":169.58,"low":166.56,"close":168.88,"volume":86185500},{"date":"2022-02-15","open":170.97,"high":172.95,"low":170.25,"close":172.79,"volume":62527400},{"date":"2022-02-16","open":171.85,"high":173.34,"low":170.05,"close":172.55,"volume":61177400},{"date":"2022-02-17","open":171.03,"high":171.91,"low":168.47,"close":168.88,"volume":69589300},{"date":"2022-02-18","open":169.82,"high":170.54,"low":166.19,"close":167.3,"volume":82772700},{"date":"2022-02-22","open":164.98,"high":166.69,"low":162.15,"close":164.32,"volume":91162800},{"date":"2022-02-23","open":165.54,"high":166.15,"low":159.75,"close":160.07,"volume":90009200},{"date":"2022-02-24","open":152.58,"high":162.85,"low":152.0,"close":162.74,"volume":141147500},{"date":"2022-02-25","open":163.84,"high":165.12,"low":160.87,"close":164.85,"volume":91974200},{"date":"2022-02-28","open":163.06,"high":165.42,"low":162.43,"close":165.12,"volume":95056600},{"date":"2022-03-01","open":164.7,"high":166.6,"low":161.97,"close":163.2,"volume":83474400},{"date":"2022-03-02","open":164.39,"high":167.36,"low":162.95,"close":166.56,"volume":79724800},{"date":"2022-03-03","open":168.47,"high":168.91,"low":165.55,"close":166.23,"volume":76678400},{"date":"2022-03-04","open":164.49,"high":165.55,"low":162.1,"close":163.17,"volume":83737200},{"date":"2022-03-07","open":163.36,"high":165.02,"low":159.04,"close":159.3,"volume":96418800},{"date":"2022-03-08","open":158.82,"high":162.88,"low":155.8,"close":157.44,"volume":131148300},{"date":"2022-03-09","open":161.48,"high":163.41,"low":159.41,"close":162.95,"volume":91454900},{"date":"2022-03-10","open":160.2,"high":160.39,"low":155.98,"close":158.52,"volume":105342000},{"date":"2022-03-11","open":158.93,"high":159.28,"low":154.5,"close":154.73,"volume":96970100},{"date":"2022-03-14","open":151.45,"high":154.12,"low":150.1,"close":150.62,"volume":108732100},{"date":"2022-03-15","open":150.9,"high":155.57,"low":150.38,"close":155.09,"volume":92964300},{"date":"2022-03-16","open":157.05,"high":160.0,"low":154.46,"close":159.59,"volume":102300200},{"date":"2022-03-17","open":158.61,"high":161.0,"low":157.63,"close":160.62,"volume":75615400},{"date":"2022-03-18","open":160.51,"high":164.48,"low":159.76,"close":163.98,"volume":123511700},{"date":"2022-03-21","open":163.51,"high":166.35,"low":163.01,"close":165.38,"volume":95811400},{"date":"2022-03-22","open":165.51,"high":169.42,"low":164.91,"close":168.82,"volume":81532000},{"date":"2022-03-23","open":167.99,"high":172.64,"low":167.65,"close":170.21,"volume":98062700},{"date":"2022-03-24","open":171.06,"high":174.14,"low":170.21,"close":174.07,"volume":90131400},{"date":"2022-03-25","open":173.88,"high":175.28,"low":172.75,"close":174.72,"volume":80546200},{"date":"2022-03-28","open":172.17,"high":175.73,"low":172.0,"close":175.6,"volume":90371900},{"date":"2022-03-29","open":176.69,"high":179.01,"low":176.34,"close":178.96,"volume":100589400},{"date":"2022-03-30","open":178.55,"high":179.61,"low":176.7,"close":177.77,"volume":92633200},{"date":"2022-03-31","open":177.84,"high":178.03,"low":174.4,"close":174.61,"volume":103049300},{"date":"2022-04-01","open":174.03,"high":174.88,"low":171.94,"close":174.31,"volume":78751300},{"date":"2022-04-04","open":174.57,"high":178.49,"low":174.44,"close":178.44,"volume":76468400},{"date":"2022-04-05","open":177.5,"high":178.3,"low":174.42,"close":175.06,"volume":73401800},{"date":"2022-04-06","open":172.36,"high":173.63,"low":170.13,"close":171.83,"volume":89058800},{"date":"2022-04-07","open":171.16,"high":173.36,"low":169.85,"close":172.14,"volume":77594700},{"date":"2022-04-08","open":171.78,"high":171.78,"low":169.2,"close":170.09,"volume":76575500},{"date":"2022-04-11","open":168.71,"high":169.03,"low":165.5,"close":165.75,"volume":72246700},{"date":"2022-04-12","open":168.02,"high":169.87,"low":166.64,"close":167.66,"volume":79265200},{"date":"2022-04-13","open":167.39,"high":171.04,"low":166.77,"close":170.4,"volume":70618900},{"date":"2022-04-14","open":170.62,"high":171.27,"low":165.04,"close":165.29,"volume":75329400},{"date":"2022-04-18","open":163.92,"high":166.6,"low":163.57,"close":165.07,"volume":69023900},{"date":"2022-04-19","open":165.02,"high":167.82,"low":163.91,"close":167.4,"volume":67723800},{"date":"2022-04-20","open":168.76,"high":168.88,"low":166.1,"close":167.23,"volume":67929800},{"date":"2022-04-21","open":168.91,"high":171.53,"low":165.91,"close":166.42,"volume":87227800},{"date":"2022-04-22","open":166.46,"high":167.87,"low":161.5,"close":161.79,"volume":84882400},{"date":"2022-04-25","open":161.12,"high":163.17,"low":158.46,"close":162.88,"volume":96046400},{"date":"2022-04-26","open":162.25,"high":162.34,"low":156.72,"close":156.8,"volume":95623200},{"date":"2022-04-27","open":155.91,"high":159.79,"low":155.38,"close":156.57,"volume":88063200},{"date":"2022-04-28","open":159.25,"high":164.52,"low":158.93,"close":163.64,"volume":130216800},{"date":"2022-04-29","open":161.84,"high":166.2,"low":157.25,"close":157.65,"volume":131747600},{"date":"2022-05-02","open":156.71,"high":158.23,"low":153.27,"close":157.96,"volume":123055300},{"date":"2022-05-03","open":158.15,"high":160.71,"low":156.32,"close":159.48,"volume":88966500},{"date":"2022-05-04","open":159.67,"high":166.48,"low":159.26,"close":166.02,"volume":108256500},{"date":"2022-05-05","open":163.85,"high":164.08,"low":154.95,"close":156.77,"volume":130525300},{"date":"2022-05-06","open":156.01,"high":159.44,"low":154.18,"close":157.28,"volume":116124600},{"date":"2022-05-09","open":154.93,"high":155.83,"low":151.49,"close":152.06,"volume":131577900},{"date":"2022-05-10","open":155.52,"high":156.74,"low":152.93,"close":154.51,"volume":115366700},{"date":"2022-05-11","open":153.5,"high":155.45,"low":145.81,"close":146.5,"volume":142689800},{"date":"2022-05-12","open":142.77,"high":146.2,"low":138.8,"close":142.56,"volume":182602000},{"date":"2022-05-13","open":144.59,"high":148.1,"low":143.11,"close":147.11,"volume":113990900},{"date":"2022-05-16","open":145.55,"high":147.52,"low":144.18,"close":145.54,"volume":86643800},{"date":"2022-05-17","open":148.86,"high":149.77,"low":146.68,"close":149.24,"volume":78336300},{"date":"2022-05-18","open":146.85,"high":147.36,"low":139.9,"close":140.82,"volume":109742900},{"date":"2022-05-19","open":139.88,"high":141.66,"low":136.6,"close":137.35,"volume":136095600},{"date":"2022-05-20","open":139.09,"high":140.7,"low":132.61,"close":137.59,"volume":137426100},{"date":"2022-05-23","open":137.79,"high":143.26,"low":137.65,"close":143.11,"volume":117726300},{"date":"2022-05-24","open":140.81,"high":141.97,"low":137.33,"close":140.36,"volume":104132700},{"date":"2022-05-25","open":138.43,"high":141.79,"low":138.34,"close":140.52,"volume":92482700},{"date":"2022-05-26","open":137.39,"high":144.34,"low":137.14,"close":143.78,"volume":90601500},{"date":"2022-05-27","open":145.39,"high":149.68,"low":145.26,"close":149.64,"volume":90978500},{"date":"2022-05-31","open":149.07,"high":150.66,"low":146.84,"close":148.84,"volume":103718400},{"date":"2022-06-01","open":149.9,"high":151.74,"low":147.68,"close":148.71,"volume":74286600},{"date":"2022-06-02","open":147.83,"high":151.27,"low":146.86,"close":151.21,"volume":72348100},{"date":"2022-06-03","open":146.9,"high":147.97,"low":144.46,"close":145.38,"volume":88471400},{"date":"2022-06-06","open":147.03,"high":148.57,"low":144.9,"close":146.14,"volume":71598400},{"date":"2022-06-07","open":144.35,"high":149.0,"low":144.1,"close":148.71,"volume":67808200},{"date":"2022-06-08","open":148.58,"high":149.87,"low":147.46,"close":147.96,"volume":53950200},{"date":"2022-06-09","open":147.08,"high":147.95,"low":142.53,"close":142.64,"volume":69473000},{"date":"2022-06-10","open":140.28,"high":140.76,"low":137.06,"close":137.13,"volume":91437900},{"date":"2022-06-13","open":132.87,"high":135.2,"low":131.44,"close":131.88,"volume":122207100},{"date":"2022-06-14","open":133.13,"high":133.89,"low":131.48,"close":132.76,"volume":84784300},{"date":"2022-06-15","open":134.29,"high":137.34,"low":132.16,"close":135.43,"volume":91533000},{"date":"2022-06-16","open":132.08,"high":132.39,"low":129.04,"close":130.06,"volume":108123900},{"date":"2022-06-17","open":130.07,"high":133.08,"low":129.81,"close":131.56,"volume":134118500}];
+const MODEL = {"window":60,"layers":"3 \u00d7 LSTM (50 units each)","dropout":"0.30 after each LSTM","optimizer":"Adam","loss":"Mean Squared Error","epochs":100,"batch":3,"early_stop":"patience 10, restore best weights"};
+const $ = id => document.getElementById(id);
+const chart = $("chart"), ctx = chart.getContext("2d");
+let range = 180, forecast = Number($("forecast").value), anim = false, raf = null;
+
+function resizeCanvas(){
+  const r=chart.getBoundingClientRect(), d=Math.min(devicePixelRatio||1,2);
+  chart.width=r.width*d; chart.height=r.height*d; ctx.setTransform(d,0,0,d,0,0); draw();
+}
+function visible(){ return DATA.slice(Math.max(0, DATA.length-range)); }
+function draw(){
+  const data=visible(), w=chart.clientWidth, h=chart.clientHeight;
+  ctx.clearRect(0,0,w,h);
+  const pad={l:45,r:18,t:22,b:38}, cw=w-pad.l-pad.r, ch=h-pad.t-pad.b;
+  const vals=data.map(d=>d.close).concat([forecast]);
+  let min=Math.min(...vals), max=Math.max(...vals), span=max-min||1; min-=span*.08; max+=span*.08;
+  const x=i=>pad.l+(i/(data.length-1))*cw, y=v=>pad.t+(1-(v-min)/(max-min))*ch;
+  ctx.strokeStyle="rgba(255,255,255,.07)"; ctx.lineWidth=1;
+  for(let i=0;i<5;i++){const yy=pad.t+i*ch/4;ctx.beginPath();ctx.moveTo(pad.l,yy);ctx.lineTo(w-pad.r,yy);ctx.stroke();
+    ctx.fillStyle="#6f7b94";ctx.font="10px system-ui";ctx.fillText("$"+(max-i*(max-min)/4).toFixed(0),4,yy+3);}
+  ctx.beginPath(); data.forEach((d,i)=>i?ctx.lineTo(x(i),y(d.close)):ctx.moveTo(x(i),y(d.close)));
+  ctx.lineWidth=2.5; ctx.strokeStyle="#22d3ee"; ctx.stroke();
+  const grad=ctx.createLinearGradient(0,pad.t,0,h);grad.addColorStop(0,"rgba(34,211,238,.18)");grad.addColorStop(1,"rgba(34,211,238,0)");
+  ctx.lineTo(x(data.length-1),h-pad.b);ctx.lineTo(x(0),h-pad.b);ctx.closePath();ctx.fillStyle=grad;ctx.fill();
+  // forecast connection
+  ctx.beginPath();ctx.moveTo(x(data.length-1),y(data[data.length-1].close));ctx.lineTo(w-pad.r,y(forecast));
+  ctx.setLineDash([6,6]);ctx.lineWidth=2;ctx.strokeStyle="#a78bfa";ctx.stroke();ctx.setLineDash([]);
+  ctx.beginPath();ctx.arc(w-pad.r,y(forecast),5,0,Math.PI*2);ctx.fillStyle="#a78bfa";ctx.fill();
+  ctx.fillStyle="#aeb8cd";ctx.font="10px system-ui";
+  ctx.fillText(data[0].date.slice(0,7),pad.l,h-12);ctx.fillText(data[data.length-1].date.slice(0,7),w-75,h-12);
+  ctx.fillStyle="#a78bfa";ctx.fillText("Scenario $"+forecast.toFixed(2),Math.max(pad.l,w-150),Math.max(14,y(forecast)-10));
+}
+function setRange(n){range=n;$("rangeLabel").textContent="Last "+n+" sessions";draw();}
+$("forecast").addEventListener("input",e=>{forecast=Number(e.target.value);$("forecastValue").textContent="$"+forecast.toFixed(2);draw();});
+$("range30").onclick=()=>setRange(30); $("range90").onclick=()=>setRange(90); $("range180").onclick=()=>setRange(180);
+$("resetBtn").onclick=()=>{range=180;forecast=Number($("forecast").value);$("rangeLabel").textContent="Last 180 sessions";draw();};
+$("animateBtn").onclick=()=>{
+  if(anim){anim=false;$("animateBtn").textContent="▶ Animate signal";return;}
+  anim=true;$("animateBtn").textContent="■ Stop animation";let t=0, base=forecast;
+  const step=()=>{if(!anim)return;t+=.035;forecast=base+(Math.sin(t)*base*.025);$("forecast").value=forecast;$("forecastValue").textContent="$"+forecast.toFixed(2);draw();raf=requestAnimationFrame(step)};step();
+};
+window.addEventListener("resize",resizeCanvas);
+const pc=document.getElementById("particles"), pctx=pc.getContext("2d");let dots=[],mx=-999,my=-999;
+function initParticles(){pc.width=innerWidth*devicePixelRatio;pc.height=innerHeight*devicePixelRatio;pctx.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0);dots=Array.from({length:80},()=>({x:Math.random()*innerWidth,y:Math.random()*innerHeight,vx:(Math.random()-.5)*.22,vy:(Math.random()-.5)*.22,r:Math.random()*1.7+.4}))}
+function particles(){pctx.clearRect(0,0,innerWidth,innerHeight);for(const a of dots){a.x+=a.vx;a.y+=a.vy;if(a.x<0||a.x>innerWidth)a.vx*=-1;if(a.y<0||a.y>innerHeight)a.vy*=-1;let dx=mx-a.x,dy=my-a.y,dist=Math.hypot(dx,dy);if(dist<150){a.x-=dx/dist*.18;a.y-=dy/dist*.18}pctx.beginPath();pctx.arc(a.x,a.y,a.r,0,Math.PI*2);pctx.fillStyle="rgba(139,92,246,.45)";pctx.fill()}requestAnimationFrame(particles)}
+addEventListener("pointermove",e=>{mx=e.clientX;my=e.clientY});addEventListener("pointerleave",()=>{mx=-999;my=-999});
+initParticles();particles();resizeCanvas();
+</script>
+</body></html>
